@@ -5,7 +5,7 @@
 
 int send_data(channel_t* conn, int dir)
 {
-	char buf[4096];
+	char buf[65536];
 	int  recv_fd = -1, send_fd = -1, len=0;
 	ssize_t recv_len = 0, send_len = 0;
 
@@ -46,8 +46,7 @@ int send_data(channel_t* conn, int dir)
 		send_len += len;
 	} while(send_len < recv_len);
 
-
-	printf("recv len %d, send len %d\n", (int)recv_len, (int)send_len);
+	/* printf("recv len %d, send len %d\n", (int)recv_len, (int)send_len); */
 	return 0;
 }
 

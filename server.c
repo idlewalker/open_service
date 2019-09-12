@@ -61,15 +61,11 @@ int get_income_connection(tuple_t* conn, int sockfd)
 	socklen_t	len;
 
 	len = sizeof(inner_conn);
-	while(1)
+	conn->fd = accept(sockfd, (struct sockaddr*)&inner_conn, &len);
+	if(conn->fd < 0)
 	{
-		conn->fd = accept(sockfd, (struct sockaddr*)&inner_conn, &len);
-		if(conn->fd < 0)
-		{
-			fprintf(stderr, "get inside conn : accept(%d) -> %s\n", sockfd, strerror(errno));
-			return -1;
-		}
-		break;
+		fprintf(stderr, "get inside conn : accept(%d) -> %s\n", sockfd, strerror(errno));
+		return -1;
 	}
 
 	struct sockaddr_in sa;
@@ -89,7 +85,6 @@ void* process_channal_data(void* arg)
 	int ret = 0;
 	fd_set fdsets;
 	int maxfd = 0;
-	struct timeval timeout={3,0};//3 senconds
 
 	fprintf(stdout, "Communication start between socket %d(%s:%d) and %d(%s,%d)!\n", 
 			conn->cli.fd, conn->cli.ip, conn->cli.port, conn->srv.fd, conn->srv.ip, conn->srv.port);
@@ -101,10 +96,13 @@ void* process_channal_data(void* arg)
 		FD_SET(conn->cli.fd, &fdsets);
 		FD_SET(conn->srv.fd, &fdsets);
 
-		ret = select(maxfd, &fdsets, NULL, NULL, &timeout);
+		ret = select(maxfd, &fdsets, NULL, NULL, NULL);
 		if(ret < 0)
 		{
 			fprintf(stderr, "process over by select() : %s\n", strerror(errno));
+			close(conn->cli.fd);
+			close(conn->srv.fd);
+			printf("thread exit now!\n");
 			return NULL;
 		}
 		if(ret == 0)
@@ -116,6 +114,9 @@ void* process_channal_data(void* arg)
 		{
 			if(send_data(conn, C2S_DIR)<0)
 			{
+				close(conn->cli.fd);
+				close(conn->srv.fd);
+				printf("thread exit now!\n");
 				return NULL;
 			}
 		}
@@ -123,11 +124,15 @@ void* process_channal_data(void* arg)
 		{
 			if(send_data(conn, S2C_DIR)<0)
 			{
+				close(conn->cli.fd);
+				close(conn->srv.fd);
+				printf("thread exit now!\n");
 				return NULL;
 			}
 		}
 	}
 
+	printf("thread exit now!\n");
 	return NULL;
 }
 
@@ -135,11 +140,8 @@ int main(int argc, char** argv)
 {
 	int ret = 0;
 	
-	channel_t conn;
 	int in_sock = 0;
 	int out_sock = 0;
-
-	memset(&conn, 0, sizeof(conn));
 
 	if(argc != 3)
 	{
@@ -162,9 +164,11 @@ int main(int argc, char** argv)
 		exit(-1);
 	}
 
-	pthread_t thr_id;
 	while(1)
 	{
+
+		pthread_t thr_id;
+		channel_t conn;
 		ret = get_income_connection(&conn.srv, in_sock);
 		if(ret != 0)
 		{

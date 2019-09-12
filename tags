@@ -20,6 +20,7 @@ cli	common.h	/^	tuple_t cli;$/;"	m	struct:_channel_t
 client_send_data	common.c	/^int client_send_data(channel_t* conn, int dir, char *magic)$/;"	f
 connect_to_target	client.c	/^int connect_to_target(char* ip, uint16_t port)$/;"	f
 fd	common.h	/^	int 		fd;$/;"	m	struct:_tuple_t
+g_start_thr_flag	client.c	/^int g_start_thr_flag = 0;$/;"	v
 get_income_connection	server.c	/^int get_income_connection(tuple_t* conn, int sockfd)$/;"	f
 ip	common.h	/^	char 		ip[16];$/;"	m	struct:_tuple_t
 main	client.c	/^int main(int argc, char** argv)$/;"	f
