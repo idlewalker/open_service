@@ -1,0 +1,34 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+C2S_DIR	common.h	23;"	d
+CC	Makefile	/^CC ?= gcc$/;"	m
+COBJS	Makefile	/^COBJS = client.o common.o$/;"	m
+CTARGET	Makefile	/^CTARGET = service_load$/;"	m
+LDFLAGS	Makefile	/^LDFLAGS = -lpthread$/;"	m
+S2C_DIR	common.h	24;"	d
+SOBJS	Makefile	/^SOBJS = server.o common.o$/;"	m
+STARGET	Makefile	/^STARGET = raven_helper$/;"	m
+__H_COMMON__	common.h	2;"	d
+_channel_t	common.h	/^typedef struct _channel_t{$/;"	s
+_tuple_t	common.h	/^typedef struct _tuple_t{$/;"	s
+channel_t	common.h	/^}channel_t;$/;"	t	typeref:struct:_channel_t
+cli	common.h	/^	tuple_t cli;$/;"	m	struct:_channel_t
+client_send_data	common.c	/^int client_send_data(channel_t* conn, int dir, char *magic)$/;"	f
+connect_to_target	client.c	/^int connect_to_target(char* ip, uint16_t port)$/;"	f
+fd	common.h	/^	int 		fd;$/;"	m	struct:_tuple_t
+get_income_connection	server.c	/^int get_income_connection(tuple_t* conn, int sockfd)$/;"	f
+ip	common.h	/^	char 		ip[16];$/;"	m	struct:_tuple_t
+main	client.c	/^int main(int argc, char** argv)$/;"	f
+main	server.c	/^int main(int argc, char** argv)$/;"	f
+port	common.h	/^	uint16_t	port;$/;"	m	struct:_tuple_t
+process_channal_data	server.c	/^void* process_channal_data(void* arg)$/;"	f
+process_data	client.c	/^void* process_data(void* linkinfo)$/;"	f
+rfu	common.h	/^	uint16_t 	rfu;$/;"	m	struct:_tuple_t
+send_data	common.c	/^int send_data(channel_t* conn, int dir)$/;"	f
+socket_init	server.c	/^int socket_init(uint16_t my_port)$/;"	f
+srv	common.h	/^	tuple_t srv;$/;"	m	struct:_channel_t
+tuple_t	common.h	/^}tuple_t;$/;"	t	typeref:struct:_tuple_t
