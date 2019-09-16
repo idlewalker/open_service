@@ -1,7 +1,4 @@
 #include "common.h"
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
 
 int send_data(channel_t* conn, int dir)
 {
@@ -50,51 +47,33 @@ int send_data(channel_t* conn, int dir)
 	return 0;
 }
 
-int client_send_data(channel_t* conn, int dir, char *magic)
+int connect_to_target(char* ip, uint16_t port)
 {
-	char buf[4096];
-	int  recvoffset = 0;
-	int  sendoffset = 0;
-	int  recv_fd = -1, send_fd = -1 ;
-	ssize_t recv_len;
+	int sockfd = 0;
+	struct sockaddr_in server;
 
-	if(dir == C2S_DIR)
-	{
-		send_fd = conn->srv.fd;
-		recv_fd = conn->cli.fd;
-		sendoffset = 0;
-		recvoffset = 20;
-	}
-	else
-	{
-		send_fd = conn->cli.fd;
-		recv_fd = conn->srv.fd;
-		sendoffset = 20;
-		recvoffset = 0;
-	}
+	memset(&server, 0, sizeof(server));
 
-	recv_len = recv(recv_fd, buf+recvoffset, sizeof(buf)-recvoffset, 0);
-	if(recv_len < 0)
+	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	if(sockfd < 0)
 	{
-		fprintf(stderr, "%s:%d recv() %s\n", __FUNCTION__, __LINE__, strerror(errno));
+		fprintf(stderr, "get inside conn : socket() -> %s\n", strerror(errno));
 		return -1;
 	}
 
-	if(recv_len == 0)
+	server.sin_addr.s_addr = inet_addr(ip);
+	server.sin_family = AF_INET;
+	server.sin_port = htons(port);
+
+	while(!connect(sockfd, (struct sockaddr*)&server, sizeof(server)))
 	{
-		return 0;
+		sleep(5);
 	}
 
-	if(recvoffset) 
-	{
-		memcpy(buf, magic, recvoffset);
-	}
+	struct sockaddr_in addr;
+	socklen_t len = sizeof(addr);
+	getsockname(sockfd, (struct sockaddr*)&addr, &len);
+	printf("IP:%s Port:%d\n", inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
 
-	if(send(send_fd, buf+sendoffset, recv_len-sendoffset, 0) < 0)
-	{
-		fprintf(stderr, "%s:%d send() %s\n", __FUNCTION__, __LINE__, strerror(errno));
-		return -1;
-	}
-
-	return 0;
+	return sockfd;
 }

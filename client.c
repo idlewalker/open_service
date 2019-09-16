@@ -1,9 +1,3 @@
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/select.h>
 #include <pthread.h>
 
 #include "common.h"
@@ -69,38 +63,6 @@ void* process_data(void* linkinfo)
 	}
 	printf("thread exit now!\n");
 	return NULL;
-}
-
-int connect_to_target(char* ip, uint16_t port)
-{
-	int sockfd = 0;
-	struct sockaddr_in server;
-
-	memset(&server, 0, sizeof(server));
-
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if(sockfd < 0)
-	{
-		fprintf(stderr, "get inside conn : socket() -> %s\n", strerror(errno));
-		return -1;
-	}
-
-	server.sin_addr.s_addr = inet_addr(ip);
-	server.sin_family = AF_INET;
-	server.sin_port = htons(port);
-
-	if(connect(sockfd, (struct sockaddr*)&server, sizeof(server)) != 0)
-	{
-		fprintf(stderr, "connect() : %s\n", strerror(errno));
-		return -1;
-	}
-
-	struct sockaddr_in addr;
-	socklen_t len = sizeof(addr);
-	getsockname(sockfd, (struct sockaddr*)&addr, &len);
-	printf("IP:%s Port:%d\n", inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
-
-	return sockfd;
 }
 
 int main(int argc, char** argv)

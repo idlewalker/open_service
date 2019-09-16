@@ -5,6 +5,12 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/select.h>
 
 #include <errno.h>
 
@@ -24,5 +30,6 @@ typedef struct _channel_t{
 #define S2C_DIR 1
 
 int send_data(channel_t* conn, int dir);
+int connect_to_target(char* ip, uint16_t port);
 
 #endif

@@ -4,12 +4,12 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
-C2S_DIR	common.h	23;"	d
+C2S_DIR	common.h	29;"	d
 CC	Makefile	/^CC ?= gcc$/;"	m
 COBJS	Makefile	/^COBJS = client.o common.o$/;"	m
 CTARGET	Makefile	/^CTARGET = service_load$/;"	m
 LDFLAGS	Makefile	/^LDFLAGS = -lpthread$/;"	m
-S2C_DIR	common.h	24;"	d
+S2C_DIR	common.h	30;"	d
 SOBJS	Makefile	/^SOBJS = server.o common.o$/;"	m
 STARGET	Makefile	/^STARGET = raven_helper$/;"	m
 __H_COMMON__	common.h	2;"	d
@@ -17,8 +17,7 @@ _channel_t	common.h	/^typedef struct _channel_t{$/;"	s
 _tuple_t	common.h	/^typedef struct _tuple_t{$/;"	s
 channel_t	common.h	/^}channel_t;$/;"	t	typeref:struct:_channel_t
 cli	common.h	/^	tuple_t cli;$/;"	m	struct:_channel_t
-client_send_data	common.c	/^int client_send_data(channel_t* conn, int dir, char *magic)$/;"	f
-connect_to_target	client.c	/^int connect_to_target(char* ip, uint16_t port)$/;"	f
+connect_to_target	common.c	/^int connect_to_target(char* ip, uint16_t port)$/;"	f
 fd	common.h	/^	int 		fd;$/;"	m	struct:_tuple_t
 g_start_thr_flag	client.c	/^int g_start_thr_flag = 0;$/;"	v
 get_income_connection	server.c	/^int get_income_connection(tuple_t* conn, int sockfd)$/;"	f
