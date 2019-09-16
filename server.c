@@ -81,27 +81,27 @@ int get_income_connection(tuple_t* conn, int sockfd)
 
 void* process_channal_data(void* arg)
 {
-	channel_t* 	conn = (channel_t*)arg;
+	channel_t 	cs_conn;
 	int ret = 0;
 	fd_set fdsets;
 	int maxfd = 0;
 
-	fprintf(stdout, "Communication start between socket %d(%s:%d) and %d(%s,%d)!\n", 
-			conn->cli.fd, conn->cli.ip, conn->cli.port, conn->srv.fd, conn->srv.ip, conn->srv.port);
+	memset(&cs_conn, 0, sizeof(cs_conn));
+	memcpy(&cs_conn, arg, sizeof(cs_conn));
 
-	maxfd = conn->cli.fd > conn->srv.fd ? conn->cli.fd + 1 : conn->srv.fd + 1;
+	maxfd = cs_conn.cli.fd > cs_conn.srv.fd ? cs_conn.cli.fd + 1 : cs_conn.srv.fd + 1;
 	while(1)
 	{
 		FD_ZERO(&fdsets);
-		FD_SET(conn->cli.fd, &fdsets);
-		FD_SET(conn->srv.fd, &fdsets);
+		FD_SET(cs_conn.cli.fd, &fdsets);
+		FD_SET(cs_conn.srv.fd, &fdsets);
 
 		ret = select(maxfd, &fdsets, NULL, NULL, NULL);
 		if(ret < 0)
 		{
 			fprintf(stderr, "process over by select() : %s\n", strerror(errno));
-			close(conn->cli.fd);
-			close(conn->srv.fd);
+			close(cs_conn.cli.fd);
+			close(cs_conn.srv.fd);
 			printf("thread exit now!\n");
 			return NULL;
 		}
@@ -110,22 +110,22 @@ void* process_channal_data(void* arg)
 			sleep(1);
 			continue;
 		}
-		if(FD_ISSET(conn->cli.fd, &fdsets))
+		if(FD_ISSET(cs_conn.cli.fd, &fdsets))
 		{
-			if(send_data(conn, C2S_DIR)<0)
+			if(send_data(&cs_conn, C2S_DIR)<0)
 			{
-				close(conn->cli.fd);
-				close(conn->srv.fd);
+				close(cs_conn.cli.fd);
+				close(cs_conn.srv.fd);
 				printf("thread exit now!\n");
 				return NULL;
 			}
 		}
-		else if(FD_ISSET(conn->srv.fd, &fdsets))
+		else if(FD_ISSET(cs_conn.srv.fd, &fdsets))
 		{
-			if(send_data(conn, S2C_DIR)<0)
+			if(send_data(&cs_conn, S2C_DIR)<0)
 			{
-				close(conn->cli.fd);
-				close(conn->srv.fd);
+				close(cs_conn.cli.fd);
+				close(cs_conn.srv.fd);
 				printf("thread exit now!\n");
 				return NULL;
 			}
@@ -139,7 +139,9 @@ void* process_channal_data(void* arg)
 int main(int argc, char** argv)
 {
 	int ret = 0;
-	
+	pthread_t thr_id;
+	channel_t conn;
+
 	int in_sock = 0;
 	int out_sock = 0;
 
@@ -166,9 +168,6 @@ int main(int argc, char** argv)
 
 	while(1)
 	{
-
-		pthread_t thr_id;
-		channel_t conn;
 		ret = get_income_connection(&conn.srv, in_sock);
 		if(ret != 0)
 		{
@@ -176,8 +175,6 @@ int main(int argc, char** argv)
 			sleep(5);
 			continue;
 		}
-
-		/* fprintf(stdout, "Inner side machine(ip:%s, port:%d) is online!\n", conn.srv.ip, conn.srv.port); */
 
 		ret = get_income_connection(&conn.cli, out_sock);
 		if(ret != 0)
@@ -188,7 +185,8 @@ int main(int argc, char** argv)
 			continue;
 		}
 
-		/* fprintf(stdout, "Outer side machine(ip:%s, port:%d) is online!\n", conn.cli.ip, conn.cli.port); */
+		fprintf(stdout, "Communication between(ip:%s, port:%d) and (ip:%s, port:%d) start and using socket(%d:%d); !\n", 
+				conn.srv.ip, conn.srv.port, conn.cli.ip, conn.cli.port, conn.srv.fd, conn.cli.fd);
 
 		pthread_create(&thr_id, NULL, process_channal_data, (void*)&conn);
 		pthread_detach(thr_id);

@@ -30,7 +30,6 @@ void* process_data(void* linkinfo)
 		FD_SET(fdcli, &fds);
 		FD_SET(fdsvr, &fds);
 
-		printf("THR:%d -> I am working!\n", (int)pthread_self());
 		ret = select(maxfd, &fds, NULL, NULL, NULL);
 		if(ret < 0)
 		{
@@ -141,21 +140,6 @@ int main(int argc, char** argv)
 		linkinfo.cli.fd = service_sock;
 		linkinfo.srv.fd = server_sock;
 		
-		/* fd_set fds; */
-		/* int ret = 0; */
-		/* while(1) */
-		/* { */
-			/* FD_ZERO(&fds); */
-			/* FD_SET(server_sock, &fds); */
-			/* ret = select(server_sock+1, &fds, NULL, NULL, NULL); */
-			/* if(ret == 0) */
-			/* { */
-				/* sleep(1); */
-				/* continue; */
-			/* } */
-			/* printf("server (sock:%d) start a conversation!\n", server_sock); */
-			/* break; */
-		/* } */
 		g_start_thr_flag = 0;
 		pthread_create(&thr_id, NULL, process_data, (void*)&linkinfo);
 		pthread_detach(thr_id);
