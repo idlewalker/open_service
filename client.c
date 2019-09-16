@@ -28,7 +28,7 @@ void* process_data(void* linkinfo)
 		if(ret < 0)
 		{
 			fprintf(stderr, "select() : %s\n", strerror(errno));
-			return NULL;
+			goto l_exit;
 		}
 
 		if(ret == 0) 
@@ -41,8 +41,7 @@ void* process_data(void* linkinfo)
 		{
 			if(send_data(&conn, C2S_DIR)<0)
 			{
-				printf("thread exit now!\n");
-				return NULL;
+				goto l_exit;
 			}
 		}
 		else if(FD_ISSET(fdsvr, &fds))
@@ -56,10 +55,16 @@ void* process_data(void* linkinfo)
 
 			if(send_data(&conn, S2C_DIR)<0)
 			{
-				printf("thread exit now!\n");
-				return NULL;
+				goto l_exit;
 			}
 		}
+	}
+l_exit:
+	//in case of quiting without setting another thread start flag
+	if(set_flag == 0)
+	{
+		g_start_thr_flag = 1;
+		printf("thread down, restart a new thread now!\n");
 	}
 	printf("thread exit now!\n");
 	return NULL;
